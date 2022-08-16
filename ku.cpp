@@ -407,7 +407,7 @@ void playerAskill() {
 				clock_t start_time = clock();
 				flushmessage();
 				cleardevice();
-				hero.speed = 10;
+				hero.speed = 7;
 				bkpx = bk.x, bkpy = bk.y;//记录上⼀时刻的背景坐标
 				playerMove(hero.speed, hero.x, hero.y);
 				bkDraw(hero.speed, hero.x, hero.y);
