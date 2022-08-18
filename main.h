@@ -106,4 +106,5 @@ void FreeMonster(node_monster* head_m);
 void FreeZiDan(list* head_m);
 
 void ctrlFps(int start_time);
+void drawAlpha(IMAGE* dstimg, int x, int y, IMAGE* srcimg);
 #endif 

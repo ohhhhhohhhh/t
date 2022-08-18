@@ -26,6 +26,9 @@ int main()
 	BeginBatchDraw();
 	while (true)
 	{
+		if (GetAsyncKeyState(VK_SPACE)) {
+			system("Pause");
+		}
 		cleardevice();
 		start_time = clock();
 		peekmessage(&m, EM_MOUSE | EM_KEY);//获取鼠标信息

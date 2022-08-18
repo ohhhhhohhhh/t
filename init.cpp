@@ -11,8 +11,8 @@ extern list* zidanA_list;
 extern int vx, vy;//子弹速度
 
 extern IMAGE img_zidanA[2];
-IMAGE img_hero1[2];
-IMAGE img_hero2[2];
+IMAGE img_hero1;
+IMAGE img_hero2;
 IMAGE img_move1[5];
 IMAGE img_move11[5];
 IMAGE img_move2[5];
@@ -23,23 +23,22 @@ IMAGE img_book2[5];
 IMAGE img_book21[5];
 IMAGE img_monster[2];
 IMAGE img_bk;
+IMAGE temp_bk;
 //图⽚加载程序
 void loadImg()
 {
 	//加载背景图
-	loadimage(&img_bk, _T("res/bk.jpg"));
+	loadimage(&img_bk, _T("res/bk.png"));
+	loadimage(&temp_bk, _T("res/bk.png"));
 	//人物朝右的图
-	loadimage(&img_hero1[0], _T("res/hero21.jpg"));
-	loadimage(&img_hero1[1], _T("res/hero2.jpg"));
+	loadimage(&img_hero1, _T("res/hero2.png"));
 	//人物朝左的图
-	loadimage(&img_hero2[0], _T("res/hero11.jpg"));
-	loadimage(&img_hero2[1], _T("res/hero1.jpg"));
+	loadimage(&img_hero2, _T("res/hero1.png"));
 	//怪物
-	loadimage(&img_monster[0], _T("res/怪物/月亮1.jpg"));
+	loadimage(&img_monster[0], _T("res/怪物/月亮111.png"));
 	loadimage(&img_monster[1], _T("res/怪物/月亮11.jpg"));
 	//子弹的图
-	loadimage(&img_zidanA[0], _T("res/子弹1.jpg"));
-	loadimage(&img_zidanA[1], _T("res/子弹.jpg"));
+	loadimage(&img_zidanA[1], _T("res/子弹.png"));
 	//主角移动的图
 	loadimage(&img_move1[0], _T("res/跑步/跑步1.jpg"));
 	loadimage(&img_move11[0], _T("res/跑步/跑步11.jpg"));
@@ -62,7 +61,7 @@ void loadImg()
 	loadimage(&img_move2[4], _T("res/跑步/跑步5l.jpg"));
 	loadimage(&img_move21[4], _T("res/跑步/跑步51l.jpg"));
 	//书的图片
-	loadimage(&img_book[0], _T("res/书/书1.jpg"));
+	loadimage(&img_book[0], _T("res/书/书.png"));//*************************
 	loadimage(&img_book1[0], _T("res/书/书11.jpg"));
 	loadimage(&img_book[1], _T("res/书/书2.jpg"));
 	loadimage(&img_book1[1], _T("res/书/书21.jpg"));
@@ -102,20 +101,20 @@ void gameInit() {
 void gameDraw()
 {
 	//输出背景图⽚到指定位置
-	putimage(bk.x, bk.y, &img_bk);
+	putimage(bk.x, bk.y, &temp_bk);
+	drawAlpha(&temp_bk, bk.x, bk.y, &img_bk);
 	static int count_move;
 	static int count_shoot;
 	//输出⻆⾊A图⽚
 	if (hero.dir == 2 && hero.dongzuo == 0) {
 		count_move = 0;
-		putimage(hero.x - 40, hero.y - 42, &img_hero1[0], NOTSRCERASE);
-		putimage(hero.x - 40, hero.y - 42, &img_hero1[1], SRCINVERT);
+		drawAlpha(&temp_bk, hero.x - 40 - bk.x, hero.y - 42 - bk.y, &img_hero1);
 	}
 	if (hero.dir == 1 && hero.dongzuo == 0) {
 		count_move = 0;
-		putimage(hero.x - 40, hero.y - 42, &img_hero2[0], NOTSRCERASE);
-		putimage(hero.x - 40, hero.y - 42, &img_hero2[1], SRCINVERT);
+		drawAlpha(&temp_bk, hero.x - 40 - bk.x, hero.y - 42 - bk.y, &img_hero2);
 	}
+	
 	//移动时的动画
 	if (hero.dongzuo == 1  && hero.dir == 2) {
 		if (count_move <= 11) {
@@ -173,8 +172,7 @@ void gameDraw()
 		putimage(hero.x - 11, hero.y + 4, &img_book2[0], SRCINVERT);
 	}
 	if (hero.dir == 2 && hero.shoot == 0) {
-		putimage(hero.x - 15, hero.y + 4, &img_book1[0], NOTSRCERASE);
-		putimage(hero.x - 15, hero.y + 4, &img_book[0], SRCINVERT);
+		drawAlpha(&temp_bk, hero.x - 16 - bk.x, hero.y + 4 - bk.y, &img_book[0]);
 	}
 	//施法动作
 	if (hero.dir == 1 && hero.shoot == 1) {
@@ -215,8 +213,7 @@ void gameDraw()
 	}
 	if (hero.dir == 2 && hero.shoot == 1) {
 		if (count_shoot <= 5) {
-			putimage(hero.x - 15, hero.y + 4, &img_book1[0], NOTSRCERASE);
-			putimage(hero.x - 15, hero.y + 4, &img_book[0], SRCINVERT);
+			drawAlpha(&temp_bk, hero.x - 16 - bk.x, hero.y + 4 - bk.y, &img_book[0]);
 		}
 	    else if (count_shoot <=11) {
 			putimage(hero.x - 15, hero.y + 4, &img_book1[1], NOTSRCERASE);

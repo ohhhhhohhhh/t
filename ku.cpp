@@ -10,6 +10,7 @@ extern BK bk;
 extern HERO hero;
 extern list* zidanA_list;
 extern IMAGE img_monster[2];
+extern IMAGE temp_bk;
 extern int vx, vy;
 extern int bkpx, bkpy;
 
@@ -74,8 +75,9 @@ void DrawMonster(int herox, int heroy, int bkx, int bky, int bkpx, int bkpy) {
 					}
 					p->inf.x = px + bkx;
 					p->inf.y = py + bky;
-					putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[0], NOTSRCERASE);
-					putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[1], SRCINVERT);
+					//putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[0], NOTSRCERASE);
+					//putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[1], SRCINVERT);
+					drawAlpha(&temp_bk, p->inf.x - 50 - bk.x, p->inf.y - 100 - bk.y, &img_monster[0]);
 				}
 				if (p->inf.Health_point == 0) {
 					if (start == -1) {
@@ -297,7 +299,7 @@ int IfHit(int m_x, int m_y, int type, int z_x, int z_y)
 	switch (type)
 	{
 	case 1:
-		if (z_x <= m_x && z_x >= m_x - 100 && z_y >= m_y - 100 && z_y <= m_y + 100)
+		if (z_x <= m_x && z_x >= m_x - 100 && z_y >= m_y - 85 && z_y <= m_y + 100)
 			r = 0;
 		break;
 	default:
@@ -346,8 +348,9 @@ void showAzidan()
 	listRemoveNode(&zidanA_list);
 	for (list* cur = zidanA_list; cur != NULL; cur = cur->pnext) {
 		if (cur->isExist) {
-			putimage(cur->x, cur->y, &img_zidanA[0], NOTSRCERASE);
-			putimage(cur->x, cur->y, &img_zidanA[1], SRCINVERT);
+			//putimage(cur->x, cur->y, &img_zidanA[0], NOTSRCERASE);
+			//putimage(cur->x, cur->y, &img_zidanA[1], SRCINVERT);
+			drawAlpha(&temp_bk, cur->x - bk.x, cur->y-bk.y , &img_zidanA[1]);
 		}
 	}
 }
@@ -430,4 +433,34 @@ void ctrlFps(int start_time)
 	clock_t running_time = clock() - start_time;
 	if ((13 - running_time) >= 0)//防⽌睡眠函数使⽤负数
 		Sleep(13 - running_time);//动态睡眠
+}
+
+// 根据透明度绘图
+void drawAlpha(IMAGE *dstimg, int x, int y, IMAGE *srcimg) {
+	// 变量初始化
+	DWORD *dst = GetImageBuffer(dstimg);
+	DWORD *src = GetImageBuffer(srcimg);
+	int src_width = srcimg->getwidth();
+	int src_height = srcimg->getheight();
+	int dst_width = (dstimg == NULL ? getwidth() : dstimg->getwidth()); int dst_height = (dstimg == NULL ? getheight() : dstimg->getheight());
+	// 计算贴图的实际长宽
+	int iwidth = (x + src_width > dst_width) ? dst_width - x : src_width; // 处理超出右边界
+	int iheight = (y + src_height > dst_height) ? dst_height - y : src_height; // 处理超出下边界
+	if (x < 0) { src += -x; iwidth -= -x; x = 0; } // 处理超出左边界
+	if (y < 0) { src += src_width * -y; iheight -= -y; y = 0; } // 处理超出上边界
+	// 修正贴图起始位置
+	dst += dst_width * y + x;
+	// 实现透明贴图
+	for (int iy = 0; iy < iheight; ++iy) {
+		for (int i = 0; i < iwidth; ++i)
+		{
+			int sa = ((src[i] & 0xff000000) >> 24);//获取阿尔法值 if (sa != 0)//假如是完全透明就不处理
+			if (sa == 255)//假如完全不透明则直接拷贝
+				dst[i] = src[i];
+			else//真正需要阿尔法混合计算的图像边界才进行混合
+				dst[i] = ((((src[i] & 0xff0000) >> 16) + ((dst[i] & 0xff0000) >> 16) * (255 - sa) / 255) << 16) | ((((src[i] & 0xff00) >> 8) + ((dst[i] & 0xff00) >>8) * (255 - sa) / 255) << 8) | ((src[i] & 0xff) + (dst[i] & 0xff) * (255 - sa) / 255);
+		}
+		dst += dst_width;
+		src += src_width;
+	}
 }
