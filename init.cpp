@@ -76,6 +76,7 @@ void gameInit() {
 void gameDraw()
 {
 	//输出背景图⽚到指定位置
+	putimage(bk.x, bk.y, &temp_bk);
 	drawAlpha1(&temp_bk, 0, 0, &img_bk);
 	static int count_move;
 	static int count_shoot;
@@ -218,5 +219,5 @@ void gameDraw()
 		count_shoot++;
 	}
 
-	putimage(bk.x, bk.y, &temp_bk);
+	
 }
