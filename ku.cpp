@@ -185,56 +185,96 @@ void MouseControl(ExMessage m, int* num) {
 
 //背景移动
 void bkDraw(int speed, int x, int y) {
-	if (GetAsyncKeyState(87) && y <= 370)
+	if (bk.x <= 0 && bk.y <= 0 && bk.x + temp_bk.getwidth() >= WIDTH && bk.y + temp_bk.getheight() >= HEIGHT)
 	{
-		bk.y += speed;
-		hero.dongzuo = 1;
+		if (GetAsyncKeyState(87) && y <= 370)//W
+		{
+			bk.y += speed;
+			hero.dongzuo = 1;
+		}
+		if (GetAsyncKeyState(83) && y >= 380)
+		{
+			bk.y -= speed;
+			hero.dongzuo = 1;
+		}
+		if (GetAsyncKeyState(65) && x <= 556)
+		{
+			bk.x += speed;
+			hero.dir = 1;
+			hero.dongzuo = 1;
+		}
+		if (GetAsyncKeyState(68) && x >= 570)
+		{
+			bk.x -= speed;
+			hero.dir = 2;
+			hero.dongzuo = 1;
+		}
 	}
-	if (GetAsyncKeyState(83) && y >= 380)
-	{
-		bk.y -= speed;
-		hero.dongzuo = 1;
-	}
-	if (GetAsyncKeyState(65) && x <= 556)
-	{
-		bk.x += speed;
-		hero.dir = 1;
-		hero.dongzuo = 1;
-	}
-	if (GetAsyncKeyState(68) && x >= 570)
-	{
-		bk.x -= speed;
-		hero.dir = 2;
-		hero.dongzuo = 1;
-	}
+	if (bk.x > 0)
+		bk.x = 0;
+	if (bk.y > 0)
+		bk.y = 0;
+	if (bk.x + temp_bk.getwidth() < WIDTH)
+		bk.x = WIDTH - temp_bk.getwidth();
+	if (bk.y + temp_bk.getheight() < HEIGHT)
+		bk.y = HEIGHT - temp_bk.getheight();
 }
 
 //HERO移动
 void playerMove(int speed, int x, int y)
 {
 	hero.dongzuo = 0;
-	if (GetAsyncKeyState(87) && y > 370)//W
+	if ((bk.x == 0|| bk.y == 0) || (bk.x + temp_bk.getwidth() == WIDTH || bk.y + temp_bk.getheight() == HEIGHT))
 	{
-		hero.y -= speed;
-		hero.dongzuo = 1;
+		if (GetAsyncKeyState(87) && y > 40)//W
+		{
+			hero.y -= speed;
+			hero.dongzuo = 1;
+		}
+		if (GetAsyncKeyState(83) && y < HEIGHT-40)//S
+		{
+			hero.y += speed;
+			hero.dongzuo = 1;
+		}
+		if (GetAsyncKeyState(65) && x > 40)//A
+		{
+			hero.dir = 1;
+			hero.x -= speed;
+			hero.dongzuo = 1;
+		}
+		if (GetAsyncKeyState(68) && x < WIDTH-40)//D
+		{
+			hero.dir = 2;
+			hero.x += speed;
+			hero.dongzuo = 1;
+		}
 	}
-	if (GetAsyncKeyState(83) && y < 380)//S
+	if (bk.x < 0 && bk.y < 0 && bk.x + temp_bk.getwidth() > WIDTH && bk.y + temp_bk.getheight() > HEIGHT)
 	{
-		hero.y += speed;
-		hero.dongzuo = 1;
+		if (GetAsyncKeyState(87) && y > 370)//W
+		{
+			hero.y -= speed;
+			hero.dongzuo = 1;
+		}
+		if (GetAsyncKeyState(83) && y < 380)//S
+		{
+			hero.y += speed;
+			hero.dongzuo = 1;
+		}
+		if (GetAsyncKeyState(65) && x > 556)//A
+		{
+			hero.dir = 1;
+			hero.x -= speed;
+			hero.dongzuo = 1;
+		}
+		if (GetAsyncKeyState(68) && x < 570)//D
+		{
+			hero.dir = 2;
+			hero.x += speed;
+			hero.dongzuo = 1;
+		}
 	}
-	if (GetAsyncKeyState(65) && x > 556)//A
-	{
-		hero.dir = 1;
-		hero.x -= speed;
-		hero.dongzuo = 1;
-	}
-	if (GetAsyncKeyState(68) && x < 570)//D
-	{
-		hero.dir = 2;
-		hero.x += speed;
-		hero.dongzuo = 1;
-	}
+	
 }
 
 void listPushBack(list** pplist, list* newNode)

@@ -95,12 +95,6 @@ void gameDraw()
 		}
 		p = p->next;
 	}
-	//输出子弹
-	for (list* cur = zidanA_list; cur != NULL; cur = cur->pnext) {
-		if (cur->isExist) {
-			drawAlpha(&temp_bk, cur->x - bk.x, cur->y - bk.y, &img_zidanA);
-		}
-	}
 	//输出⻆⾊A图⽚
 	if (hero.dir == 2 && hero.dongzuo == 0) {
 		count_move = 0;
@@ -218,6 +212,11 @@ void gameDraw()
 		}
 		count_shoot++;
 	}
-
+	//输出子弹
+	for (list* cur = zidanA_list; cur != NULL; cur = cur->pnext) {
+		if (cur->isExist) {
+			drawAlpha(&temp_bk, cur->x - bk.x, cur->y - bk.y, &img_zidanA);
+		}
+	}
 	
 }
