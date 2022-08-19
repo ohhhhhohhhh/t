@@ -9,7 +9,7 @@ extern struct node_monster* head_m;
 extern BK bk;
 extern HERO hero;
 extern list* zidanA_list;
-extern IMAGE img_monster[2];
+extern IMAGE img_monster;
 extern IMAGE temp_bk;
 extern int vx, vy;
 extern int bkpx, bkpy;
@@ -77,8 +77,9 @@ void DrawMonster(int herox, int heroy, int bkx, int bky, int bkpx, int bkpy) {
 					p->inf.y = py + bky;
 					//putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[0], NOTSRCERASE);
 					//putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[1], SRCINVERT);
-					drawAlpha(&temp_bk, p->inf.x - 50 - bk.x, p->inf.y - 100 - bk.y, &img_monster[0]);
+					drawAlpha(&temp_bk, p->inf.x - 50 - bk.x, p->inf.y - 100 - bk.y, &img_monster);
 				}
+
 				if (p->inf.Health_point == 0) {
 					if (start == -1) {
 						start = clock();
@@ -88,8 +89,9 @@ void DrawMonster(int herox, int heroy, int bkx, int bky, int bkpx, int bkpy) {
 					}
 					p->inf.x = p->inf.x - bkpx + bkx;
 					p->inf.y = p->inf.y - bkpy + bky;
-					putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[0], NOTSRCERASE);
-					putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[1], SRCINVERT);
+					//putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[0], NOTSRCERASE);
+					//putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[1], SRCINVERT);
+					drawAlpha(&temp_bk, p->inf.x - 50 - bk.x, p->inf.y - 100 - bk.y, &img_monster);
 				}
 			}
 			if (p->inf.type == 2) {
@@ -121,8 +123,9 @@ void DrawMonster1(int bkx, int bky, int bkpx, int bkpy) {
 				setfillcolor(BLACK);
 				p->inf.x = p->inf.x - bkpx + bkx;
 				p->inf.y = p->inf.y - bkpy + bky;
-				putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[0], NOTSRCERASE);
-				putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[1], SRCINVERT);
+				//putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[0], NOTSRCERASE);
+				//putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[1], SRCINVERT);
+				drawAlpha(&temp_bk, p->inf.x - 50 - bk.x, p->inf.y - 100 - bk.y, &img_monster);
 			}
 			if (p->inf.type == 4) {
 				p->inf.x = p->inf.x - bkpx + bkx;
@@ -340,7 +343,7 @@ void listRemoveNode(list** pplist)
 	}
 }
 
-IMAGE img_zidanA[2];
+IMAGE img_zidanA;
 
 void showAzidan()
 {
@@ -348,9 +351,7 @@ void showAzidan()
 	listRemoveNode(&zidanA_list);
 	for (list* cur = zidanA_list; cur != NULL; cur = cur->pnext) {
 		if (cur->isExist) {
-			//putimage(cur->x, cur->y, &img_zidanA[0], NOTSRCERASE);
-			//putimage(cur->x, cur->y, &img_zidanA[1], SRCINVERT);
-			drawAlpha(&temp_bk, cur->x - bk.x, cur->y-bk.y , &img_zidanA[1]);
+			drawAlpha(&temp_bk, cur->x - bk.x, cur->y-bk.y , &img_zidanA);
 		}
 	}
 }
@@ -401,7 +402,7 @@ void playerAskill() {
 		if (clock() - begin > SKILL_LAG)
 			shunyi = 1;
 		if (shunyi == 1) {
-			mciSendString(_T("open res/dio2.mp3 alias bk"), NULL, 0, NULL);
+			mciSendString(_T("open res/dio.mp3 alias bk"), NULL, 0, NULL);
 			mciSendString(_T("play bk"), NULL, 0, NULL);
 			shunyi = 0;
 			begin = clock();
@@ -410,7 +411,7 @@ void playerAskill() {
 				clock_t start_time = clock();
 				flushmessage();
 				cleardevice();
-				hero.speed = 7;
+				hero.speed = 6;
 				bkpx = bk.x, bkpy = bk.y;//记录上⼀时刻的背景坐标
 				playerMove(hero.speed, hero.x, hero.y);
 				bkDraw(hero.speed, hero.x, hero.y);
@@ -442,7 +443,8 @@ void drawAlpha(IMAGE *dstimg, int x, int y, IMAGE *srcimg) {
 	DWORD *src = GetImageBuffer(srcimg);
 	int src_width = srcimg->getwidth();
 	int src_height = srcimg->getheight();
-	int dst_width = (dstimg == NULL ? getwidth() : dstimg->getwidth()); int dst_height = (dstimg == NULL ? getheight() : dstimg->getheight());
+	int dst_width = (dstimg == NULL ? getwidth() : dstimg->getwidth()); 
+	int dst_height = (dstimg == NULL ? getheight() : dstimg->getheight());
 	// 计算贴图的实际长宽
 	int iwidth = (x + src_width > dst_width) ? dst_width - x : src_width; // 处理超出右边界
 	int iheight = (y + src_height > dst_height) ? dst_height - y : src_height; // 处理超出下边界
