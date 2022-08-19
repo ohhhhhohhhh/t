@@ -10,7 +10,7 @@ extern HERO hero;
 extern list* zidanA_list;
 extern int vx, vy;//子弹速度
 
-extern IMAGE img_zidanA;
+IMAGE img_zidanA;
 IMAGE img_hero1;
 IMAGE img_hero2;
 IMAGE img_move1[5];
@@ -76,10 +76,30 @@ void gameInit() {
 void gameDraw()
 {
 	//输出背景图⽚到指定位置
-	putimage(bk.x, bk.y, &temp_bk);
-	drawAlpha(&temp_bk, 0, 0, &img_bk);
+	drawAlpha1(&temp_bk, 0, 0, &img_bk);
 	static int count_move;
 	static int count_shoot;
+	//输出怪物
+	struct node_monster* p;
+	p = head_m;
+	while (p) {
+		if (p->inf.type == 1) {
+			drawAlpha(&temp_bk, p->inf.x - 50 - bk.x, p->inf.y - 100 - bk.y, &img_monster);
+		}
+		if (p->inf.type == 2) {
+		}
+		if (p->inf.type == 3) {
+		}
+		if (p->inf.type == 4) {
+		}
+		p = p->next;
+	}
+	//输出子弹
+	for (list* cur = zidanA_list; cur != NULL; cur = cur->pnext) {
+		if (cur->isExist) {
+			drawAlpha(&temp_bk, cur->x - bk.x, cur->y - bk.y, &img_zidanA);
+		}
+	}
 	//输出⻆⾊A图⽚
 	if (hero.dir == 2 && hero.dongzuo == 0) {
 		count_move = 0;
@@ -198,5 +218,5 @@ void gameDraw()
 		count_shoot++;
 	}
 
-	
+	putimage(bk.x, bk.y, &temp_bk);
 }

@@ -75,9 +75,7 @@ void DrawMonster(int herox, int heroy, int bkx, int bky, int bkpx, int bkpy) {
 					}
 					p->inf.x = px + bkx;
 					p->inf.y = py + bky;
-					//putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[0], NOTSRCERASE);
-					//putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[1], SRCINVERT);
-					drawAlpha(&temp_bk, p->inf.x - 50 - bk.x, p->inf.y - 100 - bk.y, &img_monster);
+					
 				}
 
 				if (p->inf.Health_point == 0) {
@@ -89,9 +87,6 @@ void DrawMonster(int herox, int heroy, int bkx, int bky, int bkpx, int bkpy) {
 					}
 					p->inf.x = p->inf.x - bkpx + bkx;
 					p->inf.y = p->inf.y - bkpy + bky;
-					//putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[0], NOTSRCERASE);
-					//putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[1], SRCINVERT);
-					drawAlpha(&temp_bk, p->inf.x - 50 - bk.x, p->inf.y - 100 - bk.y, &img_monster);
 				}
 			}
 			if (p->inf.type == 2) {
@@ -123,8 +118,6 @@ void DrawMonster1(int bkx, int bky, int bkpx, int bkpy) {
 				setfillcolor(BLACK);
 				p->inf.x = p->inf.x - bkpx + bkx;
 				p->inf.y = p->inf.y - bkpy + bky;
-				//putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[0], NOTSRCERASE);
-				//putimage(p->inf.x - 100, p->inf.y - 100, &img_monster[1], SRCINVERT);
 				drawAlpha(&temp_bk, p->inf.x - 50 - bk.x, p->inf.y - 100 - bk.y, &img_monster);
 			}
 			if (p->inf.type == 4) {
@@ -343,17 +336,11 @@ void listRemoveNode(list** pplist)
 	}
 }
 
-IMAGE img_zidanA;
 
 void showAzidan()
 {
 	listChangeXY(&zidanA_list);
 	listRemoveNode(&zidanA_list);
-	for (list* cur = zidanA_list; cur != NULL; cur = cur->pnext) {
-		if (cur->isExist) {
-			drawAlpha(&temp_bk, cur->x - bk.x, cur->y-bk.y , &img_zidanA);
-		}
-	}
 }
 
 void playerAshoot() {
@@ -453,10 +440,12 @@ void drawAlpha(IMAGE *dstimg, int x, int y, IMAGE *srcimg) {
 	// 修正贴图起始位置
 	dst += dst_width * y + x;
 	// 实现透明贴图
+
 	for (int iy = 0; iy < iheight; ++iy) {
 		for (int i = 0; i < iwidth; ++i)
 		{
-			int sa = ((src[i] & 0xff000000) >> 24);//获取阿尔法值 if (sa != 0)//假如是完全透明就不处理
+			int sa = ((src[i] & 0xff000000) >> 24);//获取阿尔法值 
+			if (sa != 0)//假如是完全透明就不处理
 			if (sa == 255)//假如完全不透明则直接拷贝
 				dst[i] = src[i];
 			else//真正需要阿尔法混合计算的图像边界才进行混合
@@ -465,4 +454,40 @@ void drawAlpha(IMAGE *dstimg, int x, int y, IMAGE *srcimg) {
 		dst += dst_width;
 		src += src_width;
 	}
+	
+}
+
+// 根据透明度绘图
+void drawAlpha1(IMAGE *dstimg, int x, int y, IMAGE *srcimg) {
+	// 变量初始化
+	DWORD *dst = GetImageBuffer(dstimg);
+	DWORD *src = GetImageBuffer(srcimg);
+	int src_width = srcimg->getwidth();
+	int src_height = srcimg->getheight();
+	int dst_width = (dstimg == NULL ? getwidth() : dstimg->getwidth());
+	int dst_height = (dstimg == NULL ? getheight() : dstimg->getheight());
+	// 计算贴图的实际长宽
+	int iwidth = (x + src_width > dst_width) ? dst_width - x : src_width; // 处理超出右边界
+	int iheight = (y + src_height > dst_height) ? dst_height - y : src_height; // 处理超出下边界
+	if (x < 0) { src += -x; iwidth -= -x; x = 0; } // 处理超出左边界
+	if (y < 0) { src += src_width * -y; iheight -= -y; y = 0; } // 处理超出上边界
+	
+	if (bk.x <= 0 && bk.y <= 0 && bk.x+WIDTH<=dst_width && bk.y+HEIGHT<=dst_height) {
+		dst += dst_width * (-bk.y) - bk.x;
+		src += src_width * (-bk.y) - bk.x;
+		for (int iy = 0; iy < HEIGHT ; ++iy) {
+			for (int i = 0; i < WIDTH ; ++i)
+			{
+				int sa = ((src[i] & 0xff000000) >> 24);//获取阿尔法值 
+				if (sa != 0)//假如是完全透明就不处理
+					if (sa == 255)//假如完全不透明则直接拷贝
+						dst[i] = src[i];
+					else//真正需要阿尔法混合计算的图像边界才进行混合
+						dst[i] = ((((src[i] & 0xff0000) >> 16) + ((dst[i] & 0xff0000) >> 16) * (255 - sa) / 255) << 16) | ((((src[i] & 0xff00) >> 8) + ((dst[i] & 0xff00) >> 8) * (255 - sa) / 255) << 8) | ((src[i] & 0xff) + (dst[i] & 0xff) * (255 - sa) / 255);
+			}
+			dst += dst_width;
+			src += src_width;
+		}
+	}
+	
 }
